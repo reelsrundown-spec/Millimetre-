@@ -1,16 +1,16 @@
 {
-  "name": "Snake & Ladder Pro",
-  "short_name": "S&L Game",
-  "start_url": "loading.html",
+"name": "Snake & Ladder Pro AI",
+  "short_name": "S&L Pro",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#f1c40f",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3406/3406930.png",
-      "sizes": "512x512",
+      "src": "icon.png",
+      "sizes": "1024x1024",
       "type": "image/png"
     }
   ]
-}
-
+    }
+    
