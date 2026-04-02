@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Snake & Ladder</title>
+    <style>
+        :root {
+            --cell-size: 38px;
+            --board-color: #2c3e50;
+        }
+        body {
+            display: flex; flex-direction: column; align-items: center;
+            background: #1a1a1a; color: white; font-family: 'Segoe UI', sans-serif;
+            margin: 0; touch-action: manipulation;
+        }
+        h2 { margin: 15px 0; color: #f1c40f; text-transform: uppercase; letter-spacing: 2px; }
+        
+        #game-container { position: relative; padding: 10px; background: #333; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(10, var(--cell-size));
+            grid-template-rows: repeat(10, var(--cell-size));
+            gap: 2px; border: 3px solid #f1c40f;
+        }
+
+        .cell {
+            width: var(--cell-size); height: var(--cell-size);
+            background: #ecf0f1; color: #333; font-weight: bold; font-size: 11px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transition: 0.3s;
+        }
+
+        .cell:nth-child(even) { background: #bdc3c7; }
+        .snake-cell { background: #ff7675 !important; }
+        .ladder-cell { background: #55efc4 !important; }
+
+        #player {
+            width: 25px; height: 25px; background: #e74c3c;
+            border: 3px solid white; border-radius: 50%;
+            position: absolute; z-index: 100;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .controls { margin-top: 20px; text-align: center; }
+        
+        #dice-btn {
+            padding: 12px 30px; font-size: 20px; font-weight: bold;
+            background: #f1c40f; color: #2c3e50; border: none;
+            border-radius: 50px; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 5px 0 #9b59b6;
+        }
+        #dice-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #9b59b6; }
+        
+        #msg { margin-top: 15px; height: 20px; color: #f1c40f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>Snake & Ladder</h2>
+    
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="board"></div>
+    </div>
+
+    <div class="controls">
+        <button id="dice-btn" onclick="roll()">Roll Dice 🎲</button>
+        <div id="msg">Welcome!</div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const player = document.getElementById('player');
+        const msg = document.getElementById('msg');
+        
+        let currentPos = 1;
+        const snakes = { 27: 5, 40: 3, 43: 18, 54: 31, 66: 45, 76: 58, 89: 53, 99: 41 };
+        const ladders = { 4: 25, 13: 46, 33: 49, 42: 63, 50: 69, 62: 81, 74: 92 };
+
+        // Create Board (Boustrophedon / Zig-zag pattern)
+        for (let row = 9; row >= 0; row--) {
+            if (row % 2 !== 0) {
+                for (let col = 0; col <= 9; col++) createCell(row, col);
+            } else {
+                for (let col = 9; col >= 0; col--) createCell(row, col);
+            }
+        }
+
+        function createCell(row, col) {
+            const val = row * 10 + col + 1;
+            const div = document.createElement('div');
+            div.className = 'cell';
+            if (snakes[val]) div.classList.add('snake-cell');
+            if (ladders[val]) div.classList.add('ladder-cell');
+            div.id = 'cell-' + val;
+            div.innerText = val;
+            board.appendChild(div);
+        }
+
+        function updatePlayerPos(pos) {
+            const cell = document.getElementById('cell-' + pos);
+            const rect = cell.getBoundingClientRect();
+            const boardRect = board.getBoundingClientRect();
+            
+            player.style.left = (cell.offsetLeft + 5) + 'px';
+            player.style.top = (cell.offsetTop + 5) + 'px';
+        }
+
+        function roll() {
+            const dice = Math.floor(Math.random() * 6) + 1;
+            msg.innerText = "You rolled a " + dice;
+            
+            let newPos = currentPos + dice;
+            if (newPos > 100) return;
+
+            currentPos = newPos;
+            updatePlayerPos(currentPos);
+
+            setTimeout(() => {
+                if (snakes[currentPos]) {
+                    msg.innerText = "Oh no! A Snake 🐍";
+                    currentPos = snakes[currentPos];
+                    updatePlayerPos(currentPos);
+                } else if (ladders[currentPos]) {
+                    msg.innerText = "Yay! A Ladder 🪜";
+                    currentPos = ladders[currentPos];
+                    updatePlayerPos(currentPos);
+                }
+                if (currentPos === 100) {
+                    msg.innerText = "🎉 CHAMPION! 🎉";
+                    document.getElementById('dice-btn').disabled = true;
+                }
+            }, 600);
+        }
+
+        // Initial Position
+        updatePlayerPos(1);
+    </script>
+</body>
+</html>
