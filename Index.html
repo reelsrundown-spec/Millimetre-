@@ -4,12 +4,14 @@
     <title>Snake & Ladder Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
 </head>
-<body style="background:#000;">
+<body style="background:#000; margin:0;">
     <script>
-        // Game thudangumpol loading screen-ilekku pokan
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
         window.location.href = "loading.html";
     </script>
 </body>
-</html><link rel="apple-touch-icon" href="icon.png">
-
+</html>
