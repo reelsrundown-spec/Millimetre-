@@ -1,79 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>S&L Pro Game</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        #board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            width: 90vw;
+            height: 90vw;
+            max-width: 400px;
+            max-height: 400px;
+            margin: 10px auto;
+            border: 4px solid #f1c40f;
+            position: relative;
+            background: #fff;
+        }
+        .cell {
+            border: 0.5px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #333;
+            position: relative;
+        }
+        /* Snakes and Ladders Colors */
+        .snake-cell { background: #ff7675 !important; color: white; }
+        .ladder-cell { background: #55efc4 !important; }
+
+        .player {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 10;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        #p1 { background: #e74c3c; } /* You */
+        #p2 { background: #3498db; } /* AI */
+
+        .game-info {
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin: 10px;
+            width: 90%;
+        }
+        #dice-val { font-size: 24px; color: #f1c40f; margin: 10px; }
+    </style>
 </head>
 <body>
-    <h3 id="status">Your Turn</h3>
-    <div id="board"></div>
-    
-    <div style="margin-top:20px;">
-        <button id="roll-btn" class="btn" onclick="playGame()">ROLL DICE 🎲</button>
-        <p id="dice-result">Roll the dice!</p>
+
+    <div class="game-info">
+        <h2 id="status">Your Turn</h2>
+        <div id="dice-val">🎲 ?</div>
     </div>
 
+    <div id="board">
+        <div id="p1" class="player"></div>
+        <div id="p2" class="player"></div>
+    </div>
+
+    <button id="roll-btn" class="btn" onclick="handlePlay()">ROLL DICE</button>
+    <button class="btn" style="background:#636e72; font-size:14px; padding:10px;" onclick="window.location.href='home.html'">QUIT</button>
+
     <script>
-        const board = document.getElementById('board');
         const status = document.getElementById('status');
-        const diceRes = document.getElementById('dice-result');
+        const diceDisp = document.getElementById('dice-val');
+        const btn = document.getElementById('roll-btn');
+
+        let p1Pos = 1, p2Pos = 1;
+        const boardSize = 10;
         
-        let p1Pos = 1, p2Pos = 1; // p1: You, p2: AI
-        const portals = { 3: 22, 5: 8, 11: 26, 20: 29, 27: 1, 21: 9, 17: 4, 19: 7, 99: 5, 50: 10 };
+        // Path logic (Snakes & Ladders)
+        const portals = { 
+            3: 22, 5: 8, 11: 26, 20: 29, // Ladders
+            27: 1, 21: 9, 17: 4, 19: 7, 99: 41, 89: 53, 54: 31, 66: 45 // Snakes
+        };
 
-        // Create Zig-Zag Board
-        for (let r = 9; r >= 0; r--) {
-            for (let c = (r % 2 == 0 ? 0 : 9); (r % 2 == 0 ? c <= 9 : c >= 0); (r % 2 == 0 ? c++ : c--)) {
-                let val = r * 10 + c + 1;
-                let cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.id = 'cell-' + val;
-                cell.innerText = val;
-                board.appendChild(cell);
+        // Create Board Cells
+        const board = document.getElementById('board');
+        for (let i = 100; i >= 1; i--) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.id = 'c' + i;
+            cell.innerText = i;
+            if(portals[i]) {
+                cell.classList.add(portals[i] > i ? 'ladder-cell' : 'snake-cell');
             }
+            board.appendChild(cell);
         }
 
-        // Add Players
-        const p1 = document.createElement('div'); p1.className = 'player'; p1.style.background = 'red';
-        const p2 = document.createElement('div'); p2.className = 'player'; p2.style.background = 'blue';
-
-        function move() {
-            document.getElementById('cell-' + p1Pos).appendChild(p1);
-            document.getElementById('cell-' + p2Pos).appendChild(p2);
+        function getCellCoords(pos) {
+            const cell = document.getElementById('c' + pos);
+            return { x: cell.offsetLeft, y: cell.offsetTop };
         }
-        move();
 
-        async function playGame() {
-            document.getElementById('roll-btn').disabled = true;
+        function updatePositions() {
+            const c1 = getCellCoords(p1Pos);
+            const p1Div = document.getElementById('p1');
+            p1Div.style.left = c1.x + 5 + 'px';
+            p1Div.style.top = c1.y + 5 + 'px';
+
+            const c2 = getCellCoords(p2Pos);
+            const p2Div = document.getElementById('p2');
+            p2Div.style.left = c2.x + 10 + 'px'; // Slight offset so they don't hide each other
+            p2Div.style.top = c2.y + 10 + 'px';
+        }
+
+        async function handlePlay() {
+            btn.disabled = true;
             
-            // Your Turn
+            // Player Roll
             let roll = Math.floor(Math.random() * 6) + 1;
-            diceRes.innerText = "You rolled: " + roll;
-            p1Pos = checkPos(p1Pos + roll, "You");
-            move();
-            if (p1Pos >= 100) return alert("YOU WON!");
+            diceDisp.innerText = "🎲 " + roll;
+            p1Pos = moveLogic(p1Pos, roll, "You");
+            updatePositions();
+            
+            if(p1Pos >= 100) return win("You Won! 🎉");
 
-            // AI Turn
+            // AI Roll
             status.innerText = "AI is rolling...";
-            await new Promise(res => setTimeout(res, 1000));
+            await new Promise(r => setTimeout(r, 1200));
+            
             let aiRoll = Math.floor(Math.random() * 6) + 1;
-            diceRes.innerText = "AI rolled: " + aiRoll;
-            p2Pos = checkPos(p2Pos + aiRoll, "AI");
-            move();
-            if (p2Pos >= 100) return alert("AI WON!");
+            diceDisp.innerText = "🤖 🎲 " + aiRoll;
+            p2Pos = moveLogic(p2Pos, aiRoll, "AI");
+            updatePositions();
+
+            if(p2Pos >= 100) return win("AI Won! 🤖");
 
             status.innerText = "Your Turn";
-            document.getElementById('roll-btn').disabled = false;
+            btn.disabled = false;
         }
 
-        function checkPos(pos, who) {
-            if (pos > 100) return pos - (pos - 100); 
-            if (portals[pos]) {
-                status.innerText = who + (portals[pos] > pos ? " climbed a Ladder!" : " hit a Snake!");
-                return portals[pos];
+        function moveLogic(current, roll, name) {
+            let next = current + roll;
+            if (next > 100) return current;
+            if (portals[next]) {
+                status.innerText = name + (portals[next] > next ? " 🪜 Ladder!" : " 🐍 Snake!");
+                return portals[next];
             }
-            return pos;
+            return next;
         }
+
+        function win(msg) {
+            status.innerText = msg;
+            btn.style.display = 'none';
+        }
+
+        // Initial Position
+        window.onload = updatePositions;
     </script>
 </body>
 </html>
