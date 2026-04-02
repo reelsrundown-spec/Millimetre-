@@ -1,0 +1,35 @@
+body {
+    margin: 0; background: #1a1a1a; color: white;
+    font-family: 'Poppins', sans-serif; display: flex;
+    flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; overflow: hidden;
+}
+
+.menu-box {
+    background: #333; padding: 30px; border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;
+}
+
+.btn {
+    background: #f1c40f; color: #000; border: none;
+    padding: 15px 30px; margin: 10px; border-radius: 50px;
+    font-size: 18px; font-weight: bold; cursor: pointer; width: 200px;
+}
+
+/* Board Styles */
+#board {
+    display: grid; grid-template-columns: repeat(10, 35px);
+    gap: 2px; background: #444; border: 5px solid #f1c40f;
+}
+
+.cell {
+    width: 35px; height: 35px; background: #fff; color: #000;
+    font-size: 10px; display: flex; align-items: center; justify-content: center;
+    font-weight: bold; position: relative;
+}
+
+.player {
+    width: 25px; height: 25px; border-radius: 50%;
+    position: absolute; transition: 0.4s; z-index: 5;
+    border: 2px solid #fff;
+}
