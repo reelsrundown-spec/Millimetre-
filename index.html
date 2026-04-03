@@ -6,43 +6,34 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <style>
-        body { 
-            background: #1a1a1a; color: white; font-family: sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0;
-        }
-        .install-btn {
-            background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; border: none; font-size: 18px; cursor: pointer;
-        }
+        body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .install-btn { background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; border: none; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        a { color: #f1c40f; text-decoration: none; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <img src="icon.png" width="100" style="border-radius: 20px; margin-bottom: 20px;">
+    <img src="icon.png" width="100" style="border-radius: 20px; margin-bottom: 10px;">
     <h2>Snake & Ladder Pro AI</h2>
-    <p>Install the game to your home screen</p>
     <button class="install-btn" id="installBtn">INSTALL APP</button>
-    <p><a href="loading.html" style="color: #f1c40f; text-decoration: none;">Or Play in Browser</a></p>
+    <br>
+    <a href="game/loading.html">PLAY IN BROWSER</a>
 
     <script>
-        // Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
 
-        // Install logic
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('installBtn').style.display = 'block';
         });
 
         document.getElementById('installBtn').addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
             } else {
-                window.location.href = "loading.html";
+                window.location.href = "game/loading.html";
             }
         });
     </script>
