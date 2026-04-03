@@ -15,11 +15,10 @@ body {
     padding: 15px 30px; margin: 10px; border-radius: 50px;
     font-size: 18px; font-weight: bold; cursor: pointer; width: 200px;
 }
-
-/* Board Styles */
 #board {
-    display: grid; grid-template-columns: repeat(10, 35px);
-    gap: 2px; background: #444; border: 5px solid #f1c40f;
+    /* Mattu styles ellaam pazhayathupole... */
+    background-image: url('assets/board.png'); /* Puthiya path */
+    background-size: 100% 100%;
 }
 
 .cell {
