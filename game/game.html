@@ -84,18 +84,31 @@
             27: 1, 21: 9, 17: 4, 19: 7, 99: 41, 89: 53, 54: 31, 66: 45 // Snakes
         };
 
-        // Create Board Cells
-        const board = document.getElementById('board');
-        for (let i = 100; i >= 1; i--) {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.id = 'c' + i;
-            cell.innerText = i;
-            if(portals[i]) {
-                cell.classList.add(portals[i] > i ? 'ladder-cell' : 'snake-cell');
-            }
-            board.appendChild(cell);
-        }
+        // Create Zig-Zag Board (Boustrophedon)
+const board = document.getElementById('board');
+for (let r = 9; r >= 0; r--) {
+    let rowStart = r * 10 + 1;
+    let rowEnd = r * 10 + 10;
+    
+    if (r % 2 === 0) {
+        // Even rows: 1-10, 21-30 (Left to Right)
+        for (let i = rowStart; i <= rowEnd; i++) createCell(i);
+    } else {
+        // Odd rows: 11-20, 31-40 (Right to Left)
+        for (let i = rowEnd; i >= rowStart; i--) createCell(i);
+    }
+}
+
+function createCell(val) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.id = 'c' + val;
+    cell.innerText = val;
+    if (portals[val]) {
+        cell.classList.add(portals[val] > val ? 'ladder-cell' : 'snake-cell');
+    }
+    board.appendChild(cell);
+}
 
         function getCellCoords(pos) {
             const cell = document.getElementById('c' + pos);
